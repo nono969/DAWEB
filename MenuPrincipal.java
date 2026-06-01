@@ -2,14 +2,17 @@ package apresentacao;
 
 import servicos.PrinterService;
 import servicos.ReaderService;
+import servicos.EstudanteService;
+import servicos.DisciplinaService;
+import servicos.EstudanteDTO;
+import servicos.DisciplinaDTO;
 import modelo.Estudantes;
-import modelo.Disciplina;
 
 public class MenuPrincipal {
     public static void main(String[] args) {
         PrinterService printer = new PrinterService();
         ReaderService reader = new ReaderService();
-        EstudantesService estudanteService = new EstudantesService();
+        EstudanteService estudanteService = new EstudanteService();
         DisciplinaService disciplinaService = new DisciplinaService();
         
         int opcao;
@@ -20,13 +23,13 @@ public class MenuPrincipal {
             
             switch(opcao) {
                 case 1: // cadastrar disciplina
-                    Disciplina novaDisciplina = reader.lerNovaDisciplina();
+                    DisciplinaDTO novaDisciplina = reader.lerNovaDisciplina();
                     disciplinaService.cadastrar(novaDisciplina);
                     reader.esperarEnter();
                     break;
                     
                 case 2: // cadastrar estudante
-                    Estudantes novoEstudante = reader.lerNovoEstudante();
+                    EstudanteDTO novoEstudante = reader.lerNovoEstudante();
                     estudanteService.cadastrar(novoEstudante);
                     reader.esperarEnter();
                     break;
@@ -34,8 +37,15 @@ public class MenuPrincipal {
                 case 3: // matricular 
                     printer.subtitulo("MATRICULAR ESTUDANTE EM DISCIPLINA");
                     int matricula = reader.lerMatriculaEstudante();
-                    Estudantes estudante = estudanteService.buscar(matricula);
+                    EstudanteDTO estudanteDTO = estudanteService.buscar(matricula);
                     
+                    if(estudanteDTO == null) {
+                        reader.esperarEnter();
+                        break;
+                    }
+                    
+                    // Precisa do modelo para matricular (relacionamento)
+                    Estudantes estudante = estudanteService.buscarModelo(matricula);
                     if(estudante == null) {
                         reader.esperarEnter();
                         break;
@@ -56,32 +66,42 @@ public class MenuPrincipal {
                 case 5: // editar disciplina
                     printer.subtitulo("EDITAR DISCIPLINA");
                     int codEditar = reader.lerCodigoDisciplina();
-                    Disciplina disciplina = disciplinaService.buscar(codEditar);
+                    DisciplinaDTO disciplinaDTO = disciplinaService.buscar(codEditar);
                     
-                    if(disciplina == null) {
+                    if(disciplinaDTO == null) {
                         reader.esperarEnter();
                         break;
                     }
                     
-                    printer.imprimirDisciplina(disciplina);
-                    reader.lerEdicaoDisciplina(disciplina);
-                    disciplinaService.editar(disciplina);
+                    printer.imprimirDisciplina(disciplinaDTO);
+                    DisciplinaDTO disciplinaEditada = reader.lerEdicaoDisciplina(
+                        codEditar,
+                        disciplinaDTO.getNome(),
+                        disciplinaDTO.getProfessor(),
+                        disciplinaDTO.getCargaHoraria()
+                    );
+                    disciplinaService.editar(disciplinaEditada);
                     reader.esperarEnter();
                     break;
                     
                 case 6: // editar estudante
                     printer.subtitulo("EDITAR ESTUDANTE");
                     int matEditar = reader.lerMatriculaEstudante();
-                    Estudantes estudanteEditar = estudanteService.buscar(matEditar);
+                    EstudanteDTO estudanteEditarDTO = estudanteService.buscar(matEditar);
                     
-                    if(estudanteEditar == null) {
+                    if(estudanteEditarDTO == null) {
                         reader.esperarEnter();
                         break;
                     }
                     
-                    printer.imprimirEstudante(estudanteEditar);
-                    reader.lerEdicaoEstudante(estudanteEditar);
-                    estudanteService.editar(estudanteEditar);
+                    printer.imprimirEstudante(estudanteEditarDTO);
+                    EstudanteDTO estudanteEditado = reader.lerEdicaoEstudante(
+                        matEditar,
+                        estudanteEditarDTO.getNome(),
+                        estudanteEditarDTO.getIdade(),
+                        estudanteEditarDTO.getContato()
+                    );
+                    estudanteService.editar(estudanteEditado);
                     reader.esperarEnter();
                     break;
                     
@@ -112,22 +132,5 @@ public class MenuPrincipal {
         } while(opcao != 9);
         
         reader.fechar();
-    }
-
-    private static class DisciplinaService {
-        void cadastrar(Disciplina disciplina) {}
-        void matricularEstudante(int codigo, Estudantes estudante) {}
-        void exibirLista() {}
-        Disciplina buscar(int codigo) { return null; }
-        void editar(Disciplina disciplina) {}
-        void exibirDisciplinaComAlunos(int codigo) {}
-    }
-
-    private static class EstudantesService {
-        void cadastrar(Estudantes estudante) {}
-        Estudantes buscar(int matricula) { return null; }
-        void exibirLista() {}
-        void editar(Estudantes estudante) {}
-        void exibirEstudante(int matricula) {}
     }
 }
