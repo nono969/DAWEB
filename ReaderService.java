@@ -1,8 +1,6 @@
 package servicos;
 
-import java.util.Scanner;
-import modelo.Disciplina;     
-import modelo.Estudantes;     
+import java.util.Scanner;     
 
 public class ReaderService {
     private Scanner scanner;
@@ -70,44 +68,44 @@ public class ReaderService {
         return lerInt("   Matrícula do estudante: ");
     }
     
-    public Disciplina lerNovaDisciplina() {
+    // Retorna DTO em vez de modelo diretamente
+    public DisciplinaDTO lerNovaDisciplina() {
         printer.subtitulo("CADASTRO DE DISCIPLINA");
         int codigo = lerInt("   Código: ");
         String nome = lerStringObrigatoria("   Nome: ");
         String professor = lerStringObrigatoria("   Professor: ");
         String cargaHoraria = lerStringObrigatoria("   Carga Horária: ");
-        return new Disciplina(codigo, nome, professor, cargaHoraria);
+        return new DisciplinaDTO(codigo, nome, professor, cargaHoraria);
     }
     
-    public Estudantes lerNovoEstudante() {
+    
+    public EstudanteDTO lerNovoEstudante() {
         printer.subtitulo("CADASTRO DE ESTUDANTE");
         int matricula = lerInt("   Matrícula: ");
         String nome = lerStringObrigatoria("   Nome: ");
         int idade = lerInt("   Idade: ");
         String contato = lerStringObrigatoria("   Contato: ");
-        return new Estudantes(matricula, nome, idade, contato);
+        return new EstudanteDTO(matricula, nome, idade, contato);
     }
     
-    public void lerEdicaoDisciplina(Disciplina disciplina) {
+    // retorna dto com dados atualizados
+    public DisciplinaDTO lerEdicaoDisciplina(int codigo, String nomeAtual, String professorAtual, String cargaAtual) {
         printer.info("Deixe em branco para manter o valor atual");
-        String novoNome = lerStringOpcional("   Novo nome", disciplina.getNome());
-        String novoProfessor = lerStringOpcional("   Novo professor", disciplina.getProfessor());
-        String novaCarga = lerStringOpcional("   Nova carga horária", disciplina.getCargaHoraria());
+        String novoNome = lerStringOpcional("   Novo nome", nomeAtual);
+        String novoProfessor = lerStringOpcional("   Novo professor", professorAtual);
+        String novaCarga = lerStringOpcional("   Nova carga horária", cargaAtual);
         
-        disciplina.setNome(novoNome);
-        disciplina.setProfessor(novoProfessor);
-        disciplina.setCargaHoraria(novaCarga);
+        return new DisciplinaDTO(codigo, novoNome, novoProfessor, novaCarga);
     }
     
-    public void lerEdicaoEstudante(Estudantes estudante) {
+   
+    public EstudanteDTO lerEdicaoEstudante(int matricula, String nomeAtual, int idadeAtual, String contatoAtual) {
         printer.info("Deixe em branco para manter o valor atual");
-        String novoNome = lerStringOpcional("   Novo nome", estudante.getNome());
-        int novaIdade = lerIntOpcional("   Nova idade", estudante.getIdade());
-        String novoContato = lerStringOpcional("   Novo contato", estudante.getContato());
+        String novoNome = lerStringOpcional("   Novo nome", nomeAtual);
+        int novaIdade = lerIntOpcional("   Nova idade", idadeAtual);
+        String novoContato = lerStringOpcional("   Novo contato", contatoAtual);
         
-        estudante.setNome(novoNome);
-        estudante.setIdade(novaIdade);
-        estudante.setContato(novoContato);
+        return new EstudanteDTO(matricula, novoNome, novaIdade, novoContato);
     }
     
     public void esperarEnter() {
